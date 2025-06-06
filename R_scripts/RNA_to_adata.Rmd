@@ -1,0 +1,73 @@
+```{r}
+library(tximport)
+library(SummarizedExperiment)
+library(scKirby)
+library(anndata)
+library(ontologyIndex)
+
+source('/workspace/scripts/rat_friend.R')
+
+save_loc = '/workspace'
+```
+
+```{r}
+# Load Metadata annotations
+# csv must have the paths to each abundance.h5 file
+s2c <- read_csv('/workspace/metadata_csvs/rat_metadata_filtered.csv')
+
+#remove "reference" samples
+filter_ref <- s2c$time!=-1
+meta_cells <- s2c[filter_ref,]
+
+meta_cells$time <- as.factor(meta_cells$time)
+```
+# Load Gene Metadata
+```{r}
+t2g <- read_tsv('/workspace/metadata_csvs/t2g.txt', col_names = FALSE)
+t2g <- dplyr::rename(t2g, TXNAME = X1,
+                     GENEID = X2
+                     )
+t2g <- separate_wider_delim(t2g, cols='TXNAME', delim = ".", names = c("ensembl_transcript_id", NA))
+t2g <- separate_wider_delim(t2g, cols='GENEID', delim = ".", names = c("ensembl_gene_id", NA))
+
+data(go)
+GO <- data.frame('go_id' = go$id,
+                 'description' = go$name)
+mart <- biomaRt::useMart(biomart = "ENSEMBL_MART_ENSEMBL",
+  dataset = "rnorvegicus_gene_ensembl")
+t2go <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id",
+    "external_gene_name", 'go_id'), mart = mart)
+t2go <- merge(t2go, GO, by='go_id', all.x=TRUE)
+```
+
+# Load transcript counts and save as anndata object
+```{r}
+tr2go <- t2go %>% 
+     group_by(ensembl_transcript_id) %>%
+     summarise(description = toString(unique(description)))
+g2go <- t2go %>% 
+         group_by(ensembl_gene_id) %>%
+         summarise(description = toString(unique(description)))
+colnames(g2go) <- c('ensembl_transcript_id', 'description')
+b2go <- rbind(tr2go, g2go)
+t2g <- merge(t2g, b2go, by='ensembl_transcript_id', all.x=TRUE)
+
+sum_exp <- triple_count_mat(meta_cells, t2g, tx=TRUE)
+saveHDF5SummarizedExperiment(sum_exp, dir=save_loc, prefix="rat_transcripts_")
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_transcripts.h5ad"))
+
+```
+
+# Load gene counts and save as anndata object
+```{r}
+t2go <- t2go %>% 
+     group_by(ensembl_gene_id) %>%
+     summarise(description = toString(unique(description)))
+t2g <- merge(t2g, t2go, by='ensembl_gene_id', all.x=TRUE)
+t2g <-  t2g[c(2, 1, 9)]
+sum_exp <- triple_count_mat(meta_cells, t2g, tx=FALSE)
+saveHDF5SummarizedExperiment(sum_exp, dir=save_loc, prefix="rat_genes_")
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc, "/omics_data/rat_genes.h5ad"))
+```

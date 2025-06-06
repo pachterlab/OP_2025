@@ -1,0 +1,119 @@
+```{r}
+library(SummarizedExperiment)
+library(MotrpacRatTraining6mo)
+library(anndata)
+library(scKirby)
+
+source('/workspace/scripts/rat_friend.R')
+
+save_loc = '/workspace'
+```
+
+METHYL Metadata generation
+```{r}
+methyl_meta <- load_methyl_feature_annotation()
+write.csv(methyl_meta,"/workspace/metadata_csvs/methyl_features.csv", row.names = FALSE)
+```
+
+# METHYL adata 1 generation
+```{r}
+
+tissues = c('BAT', 'HEART', 'HIPPOC')
+
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'METHYL')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'METHYL')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID', all =TRUE)
+    }
+}
+
+big_data[is.na(big_data)] <- 0
+genes <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data),
+                                rowData = genes, 
+                                colData = colnames(big_data))
+
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_METHYL_1.h5ad"))
+```
+
+# METHYL adata 2 generation
+```{r}
+tissues = c('KIDNEY', 'LIVER', 'LUNG')
+
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'METHYL')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'METHYL')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID', all =TRUE)
+    }
+}
+
+big_data[is.na(big_data)] <- 0
+genes <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data),
+                                rowData = genes, 
+                                colData = colnames(big_data))
+
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_METHYL_2.h5ad"))
+```
+
+# METHYL adata 3 generation
+```{r}
+tissues = c('SKM-GN', 'WAT-SC')
+
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'METHYL')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'METHYL')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID', all =TRUE)
+    }
+}
+
+big_data[is.na(big_data)] <- 0
+genes <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data),
+                                rowData = genes, 
+                                colData = colnames(big_data))
+
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_METHYL_3.h5ad"))
+```

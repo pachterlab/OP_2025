@@ -1,0 +1,280 @@
+```{r}
+library(SummarizedExperiment)
+library(anndata)
+library(scKirby)
+library(MotrpacRatTraining6mo)
+
+source('/workspace/scripts/rat_friend.R')
+
+save_loc = '/workspace'
+```
+
+# Generate Feature to Gene file
+```{r}
+f2g<- FEATURE_TO_GENE
+write.csv(f2g,"/workspace/metadata_csvs/feature_to_gene.csv", row.names = FALSE)
+```
+
+# ATAC adata generation
+```{r}
+atac_meta <- load_atac_feature_annotation()
+write.csv(atac_meta,"/workspace/metadata_csvs/atac_features.csv", row.names = FALSE)
+
+tissues = c('BAT', 'HEART', 'HIPPOC', 'KIDNEY', 'LIVER', 'LUNG', 'SKM-GN', 'WAT-SC')
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'ATAC')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'ATAC')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID')
+    }
+}
+
+genes <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data), rowData = genes, colData = colnames(big_data))
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_ATAC.h5ad"))
+```
+
+# PHOSPHO adata generation
+```{r}
+tissues = c('CORTEX', 'SKM-GN', 'HEART', 'KIDNEY', 'LIVER', 'LUNG', 'WAT-SC')
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'PHOSPHO')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'PHOSPHO')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID')
+    }
+}
+
+proteins <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data), rowData = proteins, colData = colnames(big_data))
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_PHOSPHO.h5ad"))
+
+```
+
+# PROT adata generation
+```{r}
+prot_meta <- load_feature_annotation('PROT')
+write.csv(prot_meta,"/workspace/metadata_csvs/prot_features.csv", row.names = FALSE)
+
+tissues = c('CORTEX', 'SKM-GN', 'HEART', 'KIDNEY', 'LIVER', 'LUNG', 'WAT-SC')
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'PROT')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'PROT')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID')
+    }
+}
+
+proteins <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+library(anndata)
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data), rowData = proteins, colData = colnames(big_data))
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_PROT.h5ad"))
+```
+
+
+# Acetyl adata generation
+```{r}
+tissues = c('HEART', 'LIVER')
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'ACETYL')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'ACETYL')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID')
+    }
+}
+
+proteins <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data), rowData = proteins, colData = colnames(big_data))
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_ACETYL.h5ad"))
+```
+
+# UBIQ adata generation
+```{r}
+tissues = c('HEART', 'LIVER')
+start = TRUE
+for (tiss in tissues) {
+    if (start) {
+        big_data <- load_sample_data(tiss, 'UBIQ')
+        big_data$tissue <- NULL
+        big_data$assay <- NULL
+        big_data$feature <- NULL
+        start <- FALSE
+        old_tiss <- tiss
+    } else {
+        curr_data <- load_sample_data(tiss, 'UBIQ')
+        curr_data$tissue <- NULL
+        curr_data$assay <- NULL
+        curr_data$feature <- NULL
+        big_data <- merge(big_data, curr_data, by='feature_ID')
+    }
+}
+
+proteins <- big_data$feature_ID
+big_data$feature_ID <- NULL
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = big_data), rowData = proteins, colData = colnames(big_data))
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_UBIQ.h5ad"))
+```
+
+
+
+```{r}
+flat_data <- IMMUNO_NORM_DATA_FLAT
+metadata <- flat_data[,c('feature_ID', 'assay', 'tissue', 'dataset')]
+big_data <- flat_data
+big_data$feature <- NULL
+big_data$feature_ID <- NULL
+big_data$assay <- NULL
+big_data$tissue <- NULL
+big_data$dataset <- NULL
+pid <- colnames(big_data)
+
+start = TRUE
+for (tiss in unique(metadata$tissue)){
+    if (start) {
+    wide_data <- big_data[metadata$tissue == tiss,]
+    obs_data <- data.frame(
+        pid = colnames(wide_data),
+        pseudovial = paste(colnames(wide_data), tiss, sep='_'))
+    obs_data$tissue <- tiss
+    colnames(wide_data) <- obs_data$pseudovial
+    var_data <- metadata[metadata$tissue == tiss,][,c('feature_ID','dataset')]
+    rownames(wide_data) <- paste(var_data$feature_ID, var_data$dataset, sep='_')
+    start = FALSE
+    }
+    else{
+    temp_wide_data <- big_data[metadata$tissue == tiss,]
+    temp_obs_data <- data.frame(
+        pid = colnames(temp_wide_data),
+        pseudovial = paste(colnames(temp_wide_data), tiss, sep='_'))
+    temp_obs_data$tissue <- tiss
+    colnames(temp_wide_data) <- temp_obs_data$pseudovial
+    temp_var_data <- metadata[metadata$tissue == tiss,][,c('feature_ID','dataset')]
+    rownames(temp_wide_data) <- paste(temp_var_data$feature_ID, temp_var_data$dataset, sep='_')
+    wide_data <- merge(wide_data, temp_wide_data, by =0, all=TRUE)
+    rownames(wide_data) <- wide_data$Row.names
+    wide_data$Row.names <- NULL
+    }
+}
+
+obs_data <- data.frame('X' = colnames(wide_data))
+obs_data <- separate_wider_delim(obs_data, cols = 'X', delim = "_", names = c("pid", "tissue"))
+rownames(obs_data) <- colnames(wide_data)
+var_data <- data.frame('X' = rownames(wide_data))
+var_data <- separate_wider_delim(var_data, cols = 'X', delim = "_", names = c("feature_ID", "dataset"))
+rownames(var_data) <- rownames(wide_data)
+var_data$assay <- 'IMMUNO'
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = as.matrix(wide_data)), 
+                                rowData = var_data, 
+                                colData = obs_data)
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_IMMUNO.h5ad"))
+```
+
+```{r}
+flat_data <- METAB_NORM_DATA_FLAT
+metadata <- flat_data[,c('feature_ID', 'assay', 'tissue', 'dataset')]
+big_data <- flat_data
+big_data$feature <- NULL
+big_data$feature_ID <- NULL
+big_data$assay <- NULL
+big_data$tissue <- NULL
+big_data$dataset <- NULL
+pid <- colnames(big_data)
+
+start = TRUE
+for (tiss in unique(metadata$tissue)){
+    if (start) {
+    wide_data <- big_data[metadata$tissue == tiss,]
+    obs_data <- data.frame(
+        pid = colnames(wide_data),
+        pseudovial = paste(colnames(wide_data), tiss, sep='_sep_'))
+    obs_data$tissue <- tiss
+    colnames(wide_data) <- obs_data$pseudovial
+    var_data <- metadata[metadata$tissue == tiss,][,c('feature_ID','dataset')]
+    rownames(wide_data) <- paste(var_data$feature_ID, var_data$dataset, sep='_sep_')
+    start = FALSE
+    }
+    else{
+    temp_wide_data <- big_data[metadata$tissue == tiss,]
+    temp_obs_data <- data.frame(
+        pid = colnames(temp_wide_data),
+        pseudovial = paste(colnames(temp_wide_data), tiss, sep='_sep_'))
+    temp_obs_data$tissue <- tiss
+    colnames(temp_wide_data) <- temp_obs_data$pseudovial
+    temp_var_data <- metadata[metadata$tissue == tiss,][,c('feature_ID','dataset')]
+    rownames(temp_wide_data) <- paste(temp_var_data$feature_ID, temp_var_data$dataset, sep='_sep_')
+    wide_data <- merge(wide_data, temp_wide_data, by =0, all=TRUE)
+    rownames(wide_data) <- wide_data$Row.names
+    wide_data$Row.names <- NULL
+    }
+}
+
+obs_data <- data.frame('X' = colnames(wide_data))
+obs_data <- separate_wider_delim(obs_data, cols = 'X', delim = "_sep_", names = c("pid", "tissue"))
+rownames(obs_data) <- colnames(wide_data)
+var_data <- data.frame('X' = rownames(wide_data))
+var_data <- separate_wider_delim(var_data, cols = 'X', delim = "_sep_", names = c("feature_ID", "dataset"))
+rownames(var_data) <- rownames(wide_data)
+var_data$assay <- 'METAB'
+
+sum_exp <- SummarizedExperiment(assays = list('counts' = as.matrix(wide_data)), 
+                                rowData = var_data, 
+                                colData = obs_data)
+adata <- se_to_anndata(sum_exp) 
+write_h5ad(adata, paste0(save_loc,"/omics_data/rat_METAB.h5ad"))
+```
