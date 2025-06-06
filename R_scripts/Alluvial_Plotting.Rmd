@@ -1,0 +1,35 @@
+```{r}
+library(alluvialmatch)
+library(reticulate)
+library(dplyr)
+library(ggplot2)
+library(ggalluvial)
+library(ggforce)
+library(igraph)
+library(tibble)
+alluvialmatch::setup_python_env()
+```
+
+```{r}
+df <- read.csv('/workspace/alluvial_inputs copy.csv')
+df$matched <- df$value > 5
+df$swapped <- !df$matched & (df$tissue == 'HIPPOC' | df$tissue == 'HYPOTH')
+df$matched <- ifelse(df$matched, '', 
+                         ifelse(df$swapped, 'Swapped', 'Mismatched'))
+df$tissue <- paste(df$tissue,"label",sep=" ")
+df$leiden_tissue[df$leiden_tissue == 'SKM-GN'] <- 'SKM'
+df[['Experimenter\n Sample Label']] <- df$tissue
+df$leiden_tissue <- paste(df$leiden_tissue,"cluster",sep=" ")
+df[['Transcriptome\n Cluster']] <- df$leiden_tissue
+```
+
+```{r}
+p <- plot_alluvial(df, graphing_columns = c("Experimenter\n Sample Label", "Transcriptome\n Cluster"), column_weights = "value", fixed_column = 1, color_bands=TRUE, color_band_boundary=TRUE,color_band_column = 'matched', color_band_list = c('snow2', 'red3', 'blue3'),
+                    color_list = c(
+    "#D55E00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#E69F00", "#CC79A7", "#666666", "#AD7700", "#1C91D4", "#007756", "#D5C711", "#005685",
+    "#A04700", "#B14380", "#4D4D4D", "#FFBE2D", "#80C7EF", "#00F6B3", "#F4EB71", "#06A5FF", "#FF8320", "#D99BBD", "#8C8C8C", "#FFCB57", "#9AD2F2",
+    "#2CFFC6", "#F6EF8E", "#38B7FF", "#FF9B4D", "#E0AFCA", "#A3A3A3", "#8A5F00", "#1674A9", "#005F45", "#AA9F0D", "#00446B", "#803800", "#8D3666",
+    "#3D3D3D"
+),include_group_sizes = FALSE, output_plot_path = '/workspace/figures/figure_1c.png')
+p
+```
