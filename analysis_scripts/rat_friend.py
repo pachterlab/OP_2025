@@ -7,6 +7,38 @@ from sklearn.metrics import mean_squared_error
 import anndata
 import scanpy as sc
 import scipy
+from patsy import dmatrix
+
+def contraster(dds_coldata, design_formula, group1, group2, weighted=False):
+    """
+    dds_coldata: pandas DataFrame (equivalent to colData(dds))
+    design_formula: string formula (e.g. '~ condition + batch')
+    group1: list of lists, where each list contains a column name followed by values
+    group2: same as group1
+    weighted: boolean flag for including duplicate rows
+    """
+    
+    # Create model matrix
+    mod_mat = dmatrix(design_formula, dds_coldata, return_type='dataframe')
+    
+    # Logical index for group1
+    grp1_rows = [dds_coldata[g[0]].isin(g[1:]) for g in group1]
+    grp1_mask = np.logical_and.reduce(grp1_rows)
+    
+    # Logical index for group2
+    grp2_rows = [dds_coldata[g[0]].isin(g[1:]) for g in group2]
+    grp2_mask = np.logical_and.reduce(grp2_rows)
+    
+    # Subset model matrices
+    mod_mat1 = mod_mat.loc[grp1_mask]
+    mod_mat2 = mod_mat.loc[grp2_mask]
+    
+    if not weighted:
+        mod_mat1 = mod_mat1.drop_duplicates()
+        mod_mat2 = mod_mat2.drop_duplicates()
+    
+    # Return the difference in column means
+    return (mod_mat1.mean() - mod_mat2.mean()).to_numpy()
 
 def nd(arr):
     """
@@ -33,7 +65,7 @@ def sum_by(adata: anndata.AnnData, col: str) -> anndata.AnnData:
         obs=pd.DataFrame(index=cat.categories)
     )
     
-def genes_in_original(gene_list, og_supp_table =2, t2go_path = 't2go.csv', og_supp_table_path = '/home/coakes/rat/',tx = False):
+def genes_in_original(gene_list, og_supp_table =2, t2go_path = 't2go.csv', og_supp_table_path = 'metadata_csvs/',tx = False):
     t2go = pd.read_csv(t2go_path)
     if og_supp_table ==2:
         og_de = pd.read_csv(og_supp_table_path+f'og_supp{og_supp_table}.csv', skiprows = 18)
@@ -175,7 +207,6 @@ def lancaster(pvalues, weights):
     
     # Calculate aggregated t-values
     t = np.array([lts(p, w) for p, w in zip(pvalues, weights)])
-    #t = np.array([lts(p, np.argsort(w)+1) for p, w in zip(pvalues, weights)])
     
     # Sum the t-values and calculate the chi-squared p-value
     t_sum = np.sum(t)
