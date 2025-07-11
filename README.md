@@ -1,14 +1,14 @@
-# OP_2025
+\section{OP 2025}
 
-Notebooks for reproducing all figures and analysis in the ** preprint. 
+Notebooks for reproducing all figures and analysis in the Transcriptomic responses to endurance exercise training in rats preprint. 
 
-## Getting Started
+\subsection*{Getting Started}
 
 All analysis notebooks, saved as .ipynb's in analysis scripts, can be run from Google Colab. Colab links are included in every notebook. 
 
 All saved/processed data used for analysis is streamed to the notebooks from [CaltechData](https://data.caltech.edu/).
 
-## Notebooks Directory Contents
+\subsection*{Notebooks Directory Contents}
  	1) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Initial_RNA_Analysis.ipynb}{Initial RNA Analysis}
 		- Initial clustering and filtering of input matrix
 		- Generates Figure 1b
@@ -49,4 +49,5 @@ All saved/processed data used for analysis is streamed to the notebooks from [Ca
 	15) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_DEseq.ipynb}{Virus DEseq}
 		- Differential virus expression analysis
 		- Generates Figures 3b-e
+
 	
