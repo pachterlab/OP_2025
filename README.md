@@ -9,21 +9,44 @@ All analysis notebooks, saved as .ipynb's in analysis scripts, can be run from G
 All saved/processed data used for analysis is streamed to the notebooks from [CaltechData](https://data.caltech.edu/).
 
 ## Notebooks Directory Contents
- 	1) Initial RNA Analysis
+ 	1) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Initial_RNA_Analysis.ipynb}{Initial RNA Analysis}
 		- Initial clustering and filtering of input matrix
-	2) Label Correction and Reanalysis 
+		- Generates Figure 1b
+	2) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Label_Correction_Reanalysis.ipynb}{Label Correction and Reanalysis}
 		- Rescues mislabeled samples then re-filters/clusters the samples
-	4) Rat Individual Overview
-	5) Linear Regression RNA
+	3) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/scVI_Batch_Correction.ipynb}{scVI Batch Correction}
+		- Generates Supplemental Figures 3a-d
+	4) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Rat_Individual_Overview.ipynb}{Rat Individual Overview}
+		- Visualizes distribution of samples across -omics and individuals
+		- Generates Figure 1a and Supplemental Figure 1
+	5) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Linear_Regression_RNA.ipynb}{Linear Regression RNA}
 		- Concatenates tissue samples by individual rat then runs linear regression
-	6) Linear Regression Physiological
-	7) Partial Correlation Analysis
-	8) Linear Regression scVI
-	9) Rat Omic Loading
-	10) Linear Regression Omic
-	11) ATAC and METHYL Analysis
-	12) DEseq 
-	13) Virus QC
-	14) Virus Correlation Over Time
-	15) Virus DEseq
+		- Generates Figure 1d and Supplemental Figures 2 and 6
+	6) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Linear_Regression_Physiological.ipynb}{Linear Regression Physiological}
+		- Concatenates tissue samples by individual rat then runs linear regression
+		- Generates Supplemental Figures 8a, 8b, and 9
+	7) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Partial_Correlation_Analysis.ipynb}{Partial Correlation Analysis}
+		- Concatenates tissue samples by individual rat then runs linear regression
+	8) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Linear_Regression_scVI.ipynb}{Linear Regression scVI}
+		- Concatenates tissue samples by individual rat then runs linear regression
+		- Generates Supplemental Figure 7
+	9) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Rat_Omic_Loading.ipynb}{Rat Omic Loading}
+		- Loads -omic data and adds metadata
+	10) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Linear_Regression_OMIC.ipynb}{Linear Regression Omic}
+		- Concatenates tissue samples by individual rat then runs linear regression
+		- Generates Supplemental Figures 4, 10a, and 10b
+	11) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/ATAC_METHYL_Analysis.ipynb}{ATAC and METHYL Analysis}
+		- Generates PCA plots of ATAC and METHYL data
+		- Generates Supplemental Figures 5a, 5b, and 11
+	12) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/DEseq.ipynb}{DEseq}
+		- Differential gene expression analysis
+		- Generates Figures 2a-i
+	13) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_QC.ipynb}{Virus QC}
+		- Virus quality control to remove known contaminates
+	14) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_Correlation_Over_Time.ipynb}{Virus Correlation Over Time}
+		- Correlates virus quantity over time
+		- Generates Figure 3a
+	15) \href{https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_DEseq.ipynb}{Virus DEseq}
+		- Differential virus expression analysis
+		- Generates Figures 3b-e
 	
