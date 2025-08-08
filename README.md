@@ -41,12 +41,15 @@ All saved/processed data used for analysis is streamed to the notebooks from [Ca
 12. [DEseq](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/DEseq.ipynb)
 	- Differential gene expression analysis
 	- Generates Figures 2a-i
-13. [Virus QC](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_QC.ipynb)
-	- Virus quality control to remove known contaminates
+13. [Virus Filtering](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_Filtering.ipynb)
+	- Virus Filtering to remove known contaminates
 14. [Virus Correlation Over Time](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_Correlation_Over_Time.ipynb)
 	- Correlates virus quantity over time
 	- Generates Figure 3a
 15. [Virus DEseq](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_DEseq.ipynb)
 	- Differential virus expression analysis
 	- Generates Figures 3b-e
+16. [Virus BLAST](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/Virus_BLAST.ipynb)
+	- BLAST of raw virus reads
+	- Generates Supplemental Figure 12
 	
