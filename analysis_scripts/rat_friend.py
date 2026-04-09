@@ -9,6 +9,28 @@ import scanpy as sc
 import scipy
 from patsy import dmatrix
 
+def get_color_palettes():
+    """
+    Returns the standard tissue and sex color palettes used across all analyses.
+
+    Returns:
+        tissue_colors (dict): tissue name -> hex color (19 tissues)
+        sex_colors (dict): 'male'/'female' -> hex color
+    """
+    tissues = [
+        'ADRNL', 'BAT', 'BLOOD', 'COLON', 'CORTEX', 'HEART', 'HIPPOC', 'HYPOTH',
+        'KIDNEY', 'LIVER', 'LUNG', 'OVARY', 'SKM-GN', 'SKM-VL', 'SMLINT', 'SPLEEN',
+        'TESTES', 'VENACV', 'WAT'
+    ]
+    colors = [
+        "#D55E00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#E69F00", "#CC79A7",
+        "#666666", "#AD7700", "#1C91D4", "#007756", "#D5C711", "#005685", "#A04700",
+        "#B14380", "#4D4D4D", "#FFBE2D", "#80C7EF", "#00F6B3"
+    ]
+    tissue_colors = dict(zip(tissues, colors))
+    sex_colors = {'male': '#E07F80', 'female': '#317EC2'}
+    return tissue_colors, sex_colors
+
 def contraster(dds_coldata, design_formula, group1, group2, weighted=False):
     """
     dds_coldata: pandas DataFrame (equivalent to colData(dds))
@@ -48,7 +70,7 @@ def nd(arr):
     
 def sum_by(adata: anndata.AnnData, col: str) -> anndata.AnnData:
     adata.strings_to_categoricals()
-    assert pd.api.types.is_categorical_dtype(adata.obs[col])
+    assert isinstance(adata.obs[col].dtype, pd.CategoricalDtype)
 
     cat = adata.obs[col].values
     indicator = scipy.sparse.coo_matrix(
@@ -103,16 +125,16 @@ def get_CCC(real, pred):
 
 def run_and_eval(X, y, z, sex = 1, reg = 'ridge', state = 0):
     if sex == 1:
-        train_filter = y[['pid', 'time']].groupby('pid').agg(lambda x: x.value_counts().index[0])
-        train_pids = train_filter.groupby(['time']).apply(lambda x:x.sample(1+np.round(len(x)/3).astype('int'))).index.get_level_values(1).tolist()
+        train_filter = y[['pid', 'time']].groupby('pid', observed=True).agg(lambda x: x.value_counts().index[0])
+        train_pids = train_filter.groupby(['time'], observed=True).apply(lambda x:x.sample(max(1, round(len(x)/3))), include_groups=False).index.get_level_values(1).tolist()
     else:
-        train_filter = y[['pid', 'time', 'sex']].groupby('pid').agg(lambda x: x.value_counts().index[0])
-        train_pids = train_filter.groupby(['time', 'sex']).apply(lambda x:x.sample(1+np.round(len(x)/3).astype('int'))).index.get_level_values(2).tolist()
+        train_filter = y[['pid', 'time', 'sex']].groupby('pid', observed=True).agg(lambda x: x.value_counts().index[0])
+        train_pids = train_filter.groupby(['time', 'sex'], observed=True).apply(lambda x:x.sample(max(1, round(len(x)/3))), include_groups=False).index.get_level_values(2).tolist()
     ref_mask = [x in train_pids for x in y.pid]
     X_train = X[ref_mask]
-    X_test = X[list(~np.array(ref_mask))]
+    X_test = X[~np.array(ref_mask)]
     y_train = y[ref_mask]
-    y_test = y[list(~np.array(ref_mask))]
+    y_test = y[~np.array(ref_mask)]
     if reg == 'ridge':
         model = sklearn.linear_model.Ridge(random_state=0)
     else:
@@ -125,7 +147,7 @@ def load_annotated_omic(adata_path, omic):
     adata = anndata.read_h5ad(adata_path)
     if omic in ['RNA']:
         adata.layers["counts"] = adata.X.copy()
-        adata.obs.time = adata.obs.time.astype('int')
+        adata.obs['time'] = adata.obs['time'].astype('int')
         adata.var = pd.DataFrame({'X': adata.var.gene_id})
         adata.var['omic'] = 'RNA'
     else:
@@ -169,11 +191,16 @@ def data_reshaper_omic(a_data, tiss_list, ngenes = 90, mode = 'all',omic='RNA'):
     if omic in ['ATAC', 'METHYL']:
         big_data.obs = pd.merge(big_data.obs.reset_index(drop=True), slim_pheno.drop_duplicates('nid'), on=['nid'], how='left', suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)').set_index('nid')
     else:
-        big_data.obs = pd.merge(big_data.obs.reset_index(names='nid'), slim_pheno.drop_duplicates('nid'), on=['nid'], how='left', suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)').set_index('nid')
+        obs = big_data.obs.copy()
+        if 'nid' in obs.columns:
+            obs = obs.reset_index(drop=True)
+        else:
+            obs = obs.reset_index(names='nid')
+        big_data.obs = pd.merge(obs, slim_pheno.drop_duplicates('nid'), on=['nid'], how='left', suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)').set_index('nid')
     # filter for na
     big_data = big_data[~big_data.obs.time.isna()]
     z = big_data.var
-    y = big_data.obs
+    y = big_data.obs.copy()
     y.reset_index(inplace=True)
     X = pd.DataFrame(big_data.layers['counts'],
                      columns = big_data.var_names)
