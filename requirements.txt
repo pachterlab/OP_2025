@@ -18,3 +18,5 @@ statsmodels>=0.14.0
 patsy>=0.5.6
 Pillow>=10.0.0
 html2image>=2.0.0
+mygene>=3.2.2
+gseapy>=1.1.3

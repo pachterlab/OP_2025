@@ -87,7 +87,7 @@ def sum_by(adata: anndata.AnnData, col: str) -> anndata.AnnData:
         obs=pd.DataFrame(index=cat.categories)
     )
     
-def genes_in_original(gene_list, og_supp_table =2, t2go_path = 't2go.csv', og_supp_table_path = 'metadata_csvs/',tx = False):
+def genes_in_original(gene_list, og_supp_table =2, t2go_path = 'metadata_csvs/t2go.csv', og_supp_table_path = 'metadata_csvs/',tx = False):
     t2go = pd.read_csv(t2go_path)
     if og_supp_table ==2:
         og_de = pd.read_csv(og_supp_table_path+f'og_supp{og_supp_table}.csv', skiprows = 18)
