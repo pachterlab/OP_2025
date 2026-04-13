@@ -23,22 +23,23 @@ All saved/processed data used for analysis is streamed to the notebooks from [Ca
 3. [scVI Batch Correction](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/3_scVI_Batch_Correction.ipynb)
 	- Trains a scVI variational autoencoder (tissue as batch key, sex as covariate, 400 epochs) on normalized counts
 	- Extracts a 10-dimensional latent representation and visualizes via PCA; batch correction success assessed visually
-	- Generates Supplemental Figures 3a-d
+	- Generates Supplemental Figure 3
 
 4. [Rat Individual Overview](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/4_Rat_Individual_Overview.ipynb)
 	- Loads all 9 omic datasets and builds a binary tissue × individual coverage matrix for each omic
 	- Visualizes sample coverage as heatmaps by individual (50 rats) and by tissue (18 tissues × 2 sexes)
-	- Generates Figure 1a and Supplemental Figure 1
+	- Generates Figure 1a and Supplemental Figures 1 and 2
 
 5. [Linear Regression RNA](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/5_Linear_Regression_RNA.ipynb)
 	- Reshapes RNA data into an individuals-as-rows matrix by concatenating genes across tissues (~286k features); library-size normalizes without log-transforming to satisfy linear regression assumptions
-	- Fits Ridge regression to predict weeks of exercise using a ~1/3 train split stratified by time × sex; evaluates with concordance correlation coefficient (CCC)
-	- Generates Figure 1d and Supplemental Figures 2 and 6
+	- Fits Ridge regression to predict weeks of exercise using a ~1/3 train split stratified by time × sex; evaluates with concordance correlation coefficient (CCC) across all tissues combined and each tissue individually
+	- Runs pathway enrichment on the top model-weight genes (positive and negative) via rat-to-human gene mapping and GSEA
+	- Generates Figure 1d and Supplemental Figures 5, 6, 13, 14–30, and 31
 
 6. [Linear Regression Physiological](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/6_Linear_Regression_Physiological.ipynb)
 	- Uses the same reshape and split pipeline as notebook 5 to predict physiological outcomes: % body fat change and VO₂max change
 	- Fits separate Ridge regression models for each trait; available sample sizes are smaller (20–23 individuals) due to missing phenotype measurements
-	- Generates Supplemental Figures 8a, 8b, and 9
+	- Generates Supplemental Figures 8 and 9
 
 7. [Partial Correlation Analysis](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/7_Partial_Correlation_Analysis.ipynb)
 	- Takes the top-ranked gene from notebook 5 and computes a 4×4 partial correlation matrix with weeks of exercise, % body fat change, and VO₂max change across 29 individuals using `pingouin.partial_corr`
@@ -46,7 +47,7 @@ All saved/processed data used for analysis is streamed to the notebooks from [Ca
 
 8. [Linear Regression scVI](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/8_Linear_Regression_scVI.ipynb)
 	- Reshapes RNA data identically to notebook 5, trains scVI on the reshaped matrix, then fits Ridge regression on the 10D latent space rather than raw gene features to predict weeks of exercise
-	- Generates Supplemental Figure 7
+	- Generates Supplemental Figure 4
 
 9. [Rat Omic Loading](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/9_Rat_Omic_Loading.ipynb)
 	- Loads 7 raw omic h5ad files (ATAC, PROT, PHOSPHO, UBIQ, METAB, IMMUNO, ACETYL) and annotates each with standardized metadata and gene/feature identifiers
@@ -55,12 +56,12 @@ All saved/processed data used for analysis is streamed to the notebooks from [Ca
 10. [Linear Regression Omic](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/10_Linear_Regression_OMIC.ipynb)
 	- Concatenates all 9 omics for Heart tissue only (the only tissue sampled across all omics) into a multi-omic feature matrix; restricts to female individuals due to sparse male coverage at some timepoints
 	- Fits Ridge regression per-omic and on the combined matrix to predict weeks of exercise; compares CCC scores across omics
-	- Generates Supplemental Figures 4, 10a, and 10b
+	- Generates Supplemental Figures 10 and 32–40
 
 11. [ATAC and METHYL Analysis](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/11_ATAC_METHYL_Analysis.ipynb)
 	- Filters ATAC to promoter peaks, matches to shared genes with RNA, and computes Pearson correlation across 12.3M gene-individual-tissue pairs (r=0.108)
 	- Runs PCA on the full methylation feature matrix (~1M sites) and visualizes by tissue, sex, and time
-	- Generates Supplemental Figures 5a, 5b, and 11
+	- Generates Supplemental Figures 7 and 11
 
 12. [DEseq](https://github.com/pachterlab/OP_2025/blob/main/analysis_scripts/12_DEseq.ipynb)
 	- Runs DESeq2 on gene and transcript counts with design formula `~(tissue + sex) * time`, capturing tissue- and sex-specific time responses; features with fewer than 10 total counts are filtered
